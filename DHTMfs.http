@@ -1,0 +1,6 @@
+@DHTMfs_HostAddress = http://localhost:5067
+
+GET {{DHTMfs_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
