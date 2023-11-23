@@ -35,6 +35,12 @@ namespace DHTMfs.Migrations
                     b.Property<DateTime>("LastCheck")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTime?>("LastFileSync")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastNodeSync")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("Port")
                         .HasColumnType("INTEGER");
 

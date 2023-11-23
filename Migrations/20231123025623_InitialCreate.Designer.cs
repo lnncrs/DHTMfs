@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DHTMfs.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231121152104_InitialCreate")]
+    [Migration("20231123025623_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -36,6 +36,12 @@ namespace DHTMfs.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("LastCheck")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastFileSync")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime?>("LastNodeSync")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Port")

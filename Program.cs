@@ -22,7 +22,7 @@ builder.Services.AddSingleton<AppDbContext>(new AppDbContext(options, builder.Co
 builder.Services.AddSingleton<NodeService>();
 builder.Services.AddSingleton<FileService>();
 
-builder.Services.AddSingleton<IDictionary<string, object>>(new ConcurrentDictionary<string, object>());
+builder.Services.AddSingleton<HFile>();
 
 // Add core services to the container
 builder.Services.AddControllers();
@@ -32,14 +32,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
-
-// Get configuration
-var configuration = builder.Services.BuildServiceProvider().GetService<IConfiguration>();
-
-// Get host and port
-var url = configuration["Urls"].Split(';')[1];
-var host = url.Split(':')[1].Trim('/');
-var port = int.Parse(url.Split(':')[2]);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,13 +50,14 @@ app.MapControllers();
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    dbContext.Database.Migrate();
-
+    dbContext.Database.EnsureCreated();
 
     var nodeContext = scope.ServiceProvider.GetRequiredService<NodeService>();
-
     nodeContext.UpdateLocalNode();
     nodeContext.UpdateIsLocal();
+
+    var fileContext = scope.ServiceProvider.GetRequiredService<FileService>();
+    fileContext.UpdateFileList();
 }
 
 app.Run();

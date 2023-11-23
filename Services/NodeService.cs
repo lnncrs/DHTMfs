@@ -41,8 +41,10 @@ namespace DHTMfs.Services
             _urls = _configuration["Urls"].Split(';').ToList();
             _host = _urls[1].Split(':')[1].Trim('/');
             _port = int.Parse(_urls[1].Split(':')[2]);
-
             _nodeHash = ComputeHash.Sha256($"{_host}:{_port}");
+
+            _logger.LogInformation($"NodeHash: {_nodeHash}");
+            _logger.LogInformation($"NodeAddr: {_host}:{_port}");
         }
 
         public List<Node> GetNodes()
@@ -89,6 +91,56 @@ namespace DHTMfs.Services
             _context.SaveChanges();
         }
 
+        public bool AddNode(string host, int port)
+        {
+            var hash = ComputeHash.Sha256($"{host}:{port}");
+
+            // new node
+            var node = new Node
+            {
+                NodeHash = hash,
+                Host = host,
+                Port = port,
+                LastCheck = DateTime.UtcNow,
+                IsOnline = false,
+                IsLocal = false
+            };
+
+            try
+            {
+                _context.Nodes.Add(node);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+                // throw;
+            }
+        }
+
+        public bool RemoveNode(string hash)
+        {
+            var node = _context.Nodes.FirstOrDefault(n => n.NodeHash == hash);
+
+            if(node == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                _context.Nodes.Remove(node);
+                _context.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+                // throw;
+            }
+        }
+
         public void UpdateLocalNode()
         {
             // Current node
@@ -97,7 +149,7 @@ namespace DHTMfs.Services
                 NodeHash = _nodeHash,
                 Host = _host,
                 Port = _port,
-                LastCheck = DateTime.Now,
+                LastCheck = DateTime.UtcNow,
                 IsOnline = true,
                 IsLocal = true
             };
@@ -106,7 +158,7 @@ namespace DHTMfs.Services
 
             if (existingNode != null)
             {
-                existingNode.LastCheck = DateTime.Now;
+                existingNode.LastCheck = DateTime.UtcNow;
                 existingNode.IsOnline = true;
                 existingNode.IsLocal = true;
 

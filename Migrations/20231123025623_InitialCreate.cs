@@ -20,7 +20,9 @@ namespace DHTMfs.Migrations
                     Port = table.Column<int>(type: "INTEGER", nullable: false),
                     LastCheck = table.Column<DateTime>(type: "TEXT", nullable: false),
                     IsOnline = table.Column<bool>(type: "INTEGER", nullable: false),
-                    IsLocal = table.Column<bool>(type: "INTEGER", nullable: false)
+                    IsLocal = table.Column<bool>(type: "INTEGER", nullable: false),
+                    LastNodeSync = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    LastFileSync = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
