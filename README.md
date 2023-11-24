@@ -215,8 +215,9 @@ Teo Parashkevov<br>
 https://medium.com/the-code-vault/data-structures-distributed-hash-table-febfd01fc0af
 
 
-### [Artigo completo](/assets/ARTIGO.pdf)
+## [Artigo completo](/assets/ARTIGO.pdf)
 
+## [Slides](/assets/SLIDES.pdf)
 
 ___
 
