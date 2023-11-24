@@ -160,7 +160,7 @@ export PATH=$PATH:$DOTNET_ROOT
 
 ### Ajutando a identidade do nó
 
-Abra o arquivo app.settings.json e ajuste as URLs do nó (é imperativo nós no mesmo host terem portas distintas)
+Abra o arquivo appsettings.json e ajuste as URLs do nó (é imperativo nós no mesmo host terem portas distintas)
 
 ```json
 {
