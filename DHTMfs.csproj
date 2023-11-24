@@ -15,6 +15,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="assets\esboco.png" />
+    <None Remove="assets\logotipo-ufabc-abaixo.png" />
+    <None Remove="assets\logotipo-ufabc-extenso.png" />
+    <None Remove="assets\logotipo-ufabc-lateral.png" />
+    <None Remove="assets\no.png" />
+    <None Remove="assets\rede1.png" />
+    <None Remove="assets\rede2.png" />
+    <None Remove="assets\rede3.png" />
+    <None Remove="assets\rede4.png" />
+    <None Remove="assets\rede5.png" />
     <None Remove="DHTMfs.http" />
   </ItemGroup>
 
@@ -28,6 +38,10 @@
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="RestSharp" Version="110.2.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="assets\" />
   </ItemGroup>
 
 </Project>
