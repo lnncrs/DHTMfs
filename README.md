@@ -40,6 +40,8 @@ Foram analisadas três abordagens [1][2][3] de implementação do BitTorrent e u
 
 Optamos por uma abordagem de implementar DHTs baseadas diretamente na sua definição [7] onde é possível acompanhar as operações e deliberadamente não automatizar as alterações de nós e arquivos na rede, o que facilita sua demonstração.
 
+### Características iniciais da solução
+
 A solução foi pensada construída em torno de DHTs que são visíveis por métodos de consulta para facilitar o entendimento de seu funcionamento, e é baseada em nós colaborativos de papel e peso idêntico na rede (ou seja, sem arquitetura master/slave) que por sua vez tem mudança fácil de topologia.
 
 <div style="text-align:center">
@@ -65,11 +67,13 @@ O primeiro esboço da solução foi incluído aqui para ilustrar o processo cria
 
 4. As DHTs centrais da solução: nós e arquivos
 
+### Aspectos funcionais
+
 A solução foi desenhada para permitir sincronização de dados de nós e arquivos, ser densa ou seja, permitir conexão direta entre quaisquer dois nós, ser resistente a cenários de conexão eventual entre grupos de nós (alteração de topologia), ser compatível com cenários de trechos (ou toda) na internet e usar portas padrão SSL para não ser bloqueada por firewalls de pacote.
 
 <div style="text-align:center">
 
-![Rede](/assets/rede1.png "Rede")<br>
+![Rede](/assets/rede12.png "Rede")<br>
 Diagrama de rede densa
 
 </div>
@@ -78,7 +82,7 @@ Cada nó ao disparar gera sua identidade, carrega sua lista de nós conhecidos e
 
 <div style="text-align:center">
 
-![Nó](/assets/no.png "Nó")<br>
+![Nó](/assets/no2.png "Nó")<br>
 Diagrama de blocos de cada nó
 
 </div>
@@ -87,7 +91,7 @@ A pesquisa de arquivos ocorre por difusão na rede, mas usa um cache local sincr
 
 <div style="text-align:center">
 
-![Rede](/assets/rede2.png "Rede")<br>
+![Rede](/assets/rede22.png "Rede")<br>
 Diagrama de pesquisa na topologia variável
 
 </div>
@@ -96,7 +100,7 @@ A sincronização ocorre na rede entre os nós para novos nós e novos arquivos 
 
 <div style="text-align:center">
 
-![Rede](/assets/rede5.png "Rede")<br>
+![Rede](/assets/rede52.png "Rede")<br>
 Diagrama de sincronização
 
 </div>
@@ -113,9 +117,7 @@ Para a persistência de dados em banco foi usado o Entity Framework que é o MER
 
 ## Como fazer o build & executar a solução
 
-### Instalando o .NET Core 8
-
-Install .NET on Windows
+### Instalando o .NET Core 8 (Windows)
 
 https://learn.microsoft.com/en-us/dotnet/core/install/windows?tabs=net80
 
@@ -123,24 +125,24 @@ https://learn.microsoft.com/en-us/dotnet/core/install/windows?tabs=net80
 winget install Microsoft.DotNet.SDK.8
 ```
 
-Install .NET on Linux
+### Instalando o .NET Core 8 (Linux)
 
 https://learn.microsoft.com/en-us/dotnet/core/install/linux
 
-Fedora
+**Fedora**
 
 ```bash
 sudo dnf install dotnet-sdk-8.0
 ```
 
-Ubuntu
+**Ubuntu**
 
 ```bash
 sudo apt-get update && \
   sudo apt-get install -y dotnet-sdk-8.0
 ```
 
-Install .NET on macOS
+### Instalando o .NET Core 8 (macOS)
 
 https://learn.microsoft.com/en-us/dotnet/core/install/macos
 
@@ -158,9 +160,11 @@ mkdir -p "$DOTNET_ROOT" && tar zxf "$DOTNET_FILE" -C "$DOTNET_ROOT"
 export PATH=$PATH:$DOTNET_ROOT
 ```
 
-### Ajutando a identidade do nó
+### Ajustando a identidade do nó
 
-Abra o arquivo appsettings.json e ajuste as URLs do nó (é imperativo nós no mesmo host terem portas distintas)
+Abra o arquivo **appsettings.json** e ajuste as URLs HTTP e HTTPS do nó
+
+> É imperativo nós (instâncias do aplicativo) rodando no mesmo host terem portas distintas, e as portas configuradas aqui não estarem em uso
 
 ```json
 {
@@ -178,7 +182,7 @@ Abra o arquivo appsettings.json e ajuste as URLs do nó (é imperativo nós no m
 }
 ```
 
-### Execução
+### Build & Execução
 
 Na pasta do projeto execute o seguinte comando para fazer o build da solução
 
@@ -191,6 +195,124 @@ E o seguinte comando para executar a solução
 ```bash
 dotnet run
 ```
+
+### Checagem da subida do nó
+
+É possivel checar o nó rodando executando a função de status do nó acessando o ponto HTTPS do nó, para o exemplo da configuração mostrada acima
+
+```text
+https://localhost:5001/node/status
+```
+
+> Apesar de existir a configuração HTTP, utilize somente a HTTPS para acesso ao nó
+
+A saida deve ser proxima a seguinte
+
+<div style="text-align:center">
+
+![Status do nó](/assets/status.png "Status do nó")<br>
+Status do nó
+
+</div>
+
+Note o carimbo de data/hora, estrutura de dados do nó, e diretório de cache onde o nó armazena seus arquivos para distribuição na rede
+
+## Uma demonstração de funcionamento
+
+### Subir o  nó em modo debug (para tornar o swagger acessível)
+
+Swagger é uma UI padronizada que facilita invocar métodos REST do aplicativo sendo testado, para subir o nó e tornar seu swagger acessível é necessário subir o aplicativo em modo debug, para isso utilize a seguinte linha de comando na pasta do nó
+
+```bash
+dotnet run --configuration Debug
+```
+
+Acesse a página HTTPS do nó
+
+```text
+https://localhost:5001/swagger/index.html
+```
+
+> Apesar de existir a configuração HTTP, utilize somente a HTTPS para acesso ao nó
+
+A saída deve ser próxima a seguinte
+
+<div style="text-align:center">
+
+![Status do nó](/assets/rest.png "Status do nó")<br>
+Status do nó
+
+</div>
+
+### Funções
+
+#### De Arquivo
+
+**/file/list** - Lista os arquivos na DHT de arquivos do nó
+
+**/file/synclocal** - Lista os arquivos na pasta de cache local e os adiciona na DHT de arquivos
+
+**/file/sync** - Sincroniza a DHT de arquivos com os outros nós na rede (necessário subir mais de um nó e adicionar o nó na rede)
+
+**/file/search** - Pesquisa um arquivo pelo hash na DHT de arquivos em memória e depois nos nós da rede de não encontrada executando a função searchlocal em cada um (necessário subir mais de um nó e adicionar o nó na rede)
+
+**/file/searchlocal** - Pesquisa um arquivo pelo hash na DHT de arquivos em memória
+
+#### De Nó
+
+**/node/ping** - Retorna um carimbo de data hora para indicar que o nó está on line
+
+**/node/status** - Retorna o status detalhado do nó
+
+**/node/list** - Lista os nós da rede conhecidos pelo nó local
+
+**/node/add** - Adiciona um nó a lista de nós conhecidos do nó local
+
+**/node/remove** - Remove um nó da lista de nós conhecidos do nó local
+
+**/node/sync** - Sincroniza a lista de nós conhecidos do nó local com as listas de nós conhecidos dos nós que o nó atuial conhece. Em outras palavras, esta função atualiza a lista de nós conhecidos entre os nós, se o nó A conhece B e B conhece C, após a execução dessa função A conhece C.
+
+**/node/check** - Atualiza a lista de nós conhecidos verificando os que estão on line, via função ping em cada um
+
+### Sugestão de passo a passo para demonstração
+
+1. Triplicar a pasta do repositório
+
+2. Configurar as **portas distintas** nos três nós
+
+3. Subir os três nós distintos (A, B e C) usando o **modo debug**
+
+4. Tomar nota dos diretórios de cache de cada um, adicionar dois arquivos distintos em cada pasta de cache, seis arquivos no total portanto
+
+5. Listar nós conhecidos no nó A (deve retornar 1)
+
+6. Abrir o nó A e adicionar o nó B, Sincronizar o nó A, Checar conhecidos no nó A
+
+7. Listar nós conhecidos no nó A (deve retornar 2)
+
+8. Abrir o nó B e adicionar o nó C, Sincronizar o nó B, Checar conhecidos no nó B
+
+9. Listar nós conhecidos no nó B (deve retornar 2)
+
+10. Abrir o nó A, Sincronizar o nó A, Checar conhecidos no nó A
+
+11. Listar nós conhecidos no nó A (deve retornar 3)
+
+12. Sincronizar **localmente** a lista de aquivos nos nós A, B e C
+
+13. Listar arquivos conhecidos no nó A (deve retornar 2)
+
+14. Listar arquivos conhecidos no nó C, tomar nota de um dos hashs de arquivo (deve retornar 3)
+
+15. Pesquisar o hash de arquivo do nó C no nó A onde este arquivo **não é conhecido** ainda (deve retornar um arquivo no nó C, pesquisa usando REST)
+
+16. Sincronizar a lista de aquivos no nó A
+
+17. Listar arquivos conhecidos no nó A (deve retornar 6)
+
+18. Pesquisar o hash de arquivo do nó C no nó A onde este arquivo **agora é conhecido** (deve retornar um arquivo no nó C, pesquisa usando DHT em memória)
+
+
 
 
 ## Referências
